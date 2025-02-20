@@ -1,0 +1,369 @@
+{% extends "fns_app/base.html" %}
+{% block title %}Заполнение данных{% endblock %}
+{% block content %}
+  <div class="container">
+    <h1>Описание XML-схемы</h1><a href="" id="fillTestData">Тестово заполнить данными</a>
+    <form action="{% url 'submit_form' %}" method="post" class="main_form" id="taxForm">
+        <!-- Блок "Сведения об отправителе" -->
+        {% csrf_token %}
+        <fieldset>
+          <legend>Сведения об отправителе (необязательно)</legend>
+          
+          <label for="fio">Фамилия, имя, отчество:</label>
+          <input type="text" id="fio" name="fio" title="Фамилия, имя, отчество отправителя">
+        </fieldset>
+      
+        <!-- Блок "Описание передаваемых сведений" -->
+        <fieldset>
+          <legend>Описание передаваемых сведений</legend>
+          
+          <label for="knd">Код формы документа по КНД:</label>
+          <select id="knd" name="knd" required title="Код формы документа по КНД">
+            <option value="1190803">1190803</option>
+          </select>
+          <br><br>
+          <label for="docDate">Дата составления документа:</label>
+          <input type="date" id="docDate" name="docDate" required title="Дата составления документа">
+        </fieldset>
+
+        <fieldset>
+          <legend>Сведения об органе, направившем информацию</legend>
+
+          <label for="NameOrgan">Орган, направивший информацию</label>
+          <input type="text" name="NameOrgan" id="NameOrgan" minlength="1" maxlength="1000" title="Полное наименование органа, направившего информацию" required>
+          <br><br>
+
+          <label for="INNOrgan">ИНН органа</label>
+          <input type="text" name="INNOrgan" id="INNOrgan" title="ИНН органа, направившего информацию" pattern="([0-9]{1}[1-9]{1}|[1-9]{1}[0-9]{1})[0-9]{8}" required>
+          <br><br>
+
+          <label for="KPPOrgan">КПП органа</label>
+          <input type="text" name="KPPOrgan" id="KPPOrgan" title="КПП органа, направившего информацию" pattern="([0-9]{1}[1-9]{1}|[1-9]{1}[0-9]{1})([0-9]{2})([0-9A-Z]{2})([0-9]{3})" required>
+          <br><br>
+
+          <label for="OGRNOrgan">ОГРН органа</label>
+          <input type="text" name="OGRNOrgan" id="OGRNOrgan" title="ОГРН органа, направившего информацию" pattern="[0-9]{13}" required>
+          <br><br>
+
+        </fieldset>
+        
+        <!-- Информация об установлении, изменении и прекращении действия региональных и местных налогов -->
+        <fieldset>
+          <legend>Информация об установлении, изменении и прекращении действия региональных и местных налогов</legend>
+          <label for="NalPerMesGod">Вид акта</label>
+          <input type="text" name="NalPerMesGod" id="NalPerMesGod" minlength="1" maxlength="255" title="Вид акта об установлении, изменении, прекращении действия региональных и (или) местных налогов" required>
+          <br><br>
+          <label for="NameOrgAkt">Наименование органа, принявшего акт</label>
+          <input type="text" name="NameOrgAkt" id="NameOrgAkt" minlength="1" maxlength="255" title="Наименование органа, принявшего акт" required>
+          <br><br>
+          <label for="DatePrinAkt">Дата подписания акта</label>
+          <input type="date" name="DatePrinAkt" id="DatePrinAkt" required title="Дата подписания акта">
+          <br><br>
+          <label for="NomAkt">Номер акта (при наличии)</label>
+          <input type="text" name="NomAkt" id="NomAkt" minlength="1" maxlength="50" title="Номер акта (при наличии)">
+          <br><br>
+          <label for="DateOpubAkt">Дата первого официального опубликования акта</label>
+          <input type="date" name="DateOpubAkt" id="DateOpubAkt" required title="Дата первого официального опубликования акта">
+          <br><br>
+          <label for="DateVstypAkt">Дата вступления в силу акта</label>
+          <input type="date" name="DateVstypAkt" id="DateVstypAkt" required title="Дата вступления в силу акта">
+        </fieldset>
+
+        <fieldset>
+          <legend>Сведения о налоговой ставке</legend>
+          <label for="NameObject">Наименование (вид) объекта налогообложения</label>
+          <input type="text" name="NameObject" id="NameObject" minlength="1" maxlength="2000" title="Наименование (вид) объекта налогообложения">
+          <br><br>
+          <label for="DescNalStav">Сведения о налоговой ставке</label>
+          <select name="DescNalStav" id="DescNalStav" required title="Сведения о налоговой ставке">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+          </select>
+          <br><br>
+          <label for="taxRate">Размер налоговой ставки:</label>
+          <input 
+            type="number" 
+            id="taxRate" 
+            name="taxRate" 
+            step="0.000001" 
+            min="0" 
+            max="9999999999999999.999999"
+            title="Введите значение с точностью до 6 знаков после запятой"
+          >
+          <br><br>
+
+          <label for="measure">Единица измерения</label>
+          <select name="measure" id="measure" title="Единица измерения">
+            <option value="1">1</option>
+            <option value="2">2</option>
+          </select>
+          <br><br>
+
+          <label for="PerNalStav">Налоговый период, для которого определена налоговая ставка по туристическому налогу</label>
+          <select name="PerNalStav" id="PerNalStav" title="Налоговый период, для которого определена налоговая ставка по туристическому налогу">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+          </select>
+          <br><br>
+        </fieldset>
+
+        <fieldset>
+          <legend>Сведения о налоговой льготе</legend>
+
+          <label for="category_nal_lgot">Категория налогоплательщиков</label>
+          <input type="text" name="category_nal_lgot" id="category_nal_lgot" minlength="1" maxlength="2000" title="Категория налогоплательщиков">
+          <br><br>
+
+          <label for="SvedNalLgot">Сведения о налоговой льготе</label>
+          <select name="SvedNalLgot" id="SvedNalLgot" required title="Сведения о налоговой льготе">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+          </select>
+          <br><br>
+
+          <label for="ContentNL">Содержание налоговой льготы</label>
+          <input type="text" name="ContentNL" id="ContentNL" minlength="1" maxlength="2000" title="Содержание налоговой льготы">
+        </fieldset>
+
+        <fieldset>
+          <legend>Сведения о налоговом вычете</legend>
+
+          <label for="category_nal_vych">Категория налогоплательщиков</label>
+          <input type="text" name="category_nal_vych" id="category_nal_vych" minlength="1" maxlength="2000" title="Категория налогоплательщиков">
+          <br><br>
+
+          <label for="SvedNalVych">Сведения о налоговом вычете</label>
+          <select name="SvedNalVych" id="SvedNalVych" required title="Сведения о налоговом вычете">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+          </select>
+          <br><br>
+
+          <label for="SizeNV">Размер налогового вычета</label>
+          <input type="text" name="SizeNV" id="SizeNV" minlength="1" maxlength="255" title="Размер налогового вычета">
+          <br><br>
+        </fieldset>
+        <fieldset>
+          <legend>Сведения об установлении (изменении) срока уплаты налога или авансовых платежей по налогу</legend>
+          
+          <label for="KodUstSrok">Вид налога или платежа, в отношении которого устанавливается (изменяется) срок уплаты</label>
+          <select name="KodUstSrok" id="KodUstSrok" required title="Вид налога или платежа, в отношении которого устанавливается (изменяется) срок уплаты">
+            <option value="1">1</option>
+            <option value="2">2</option>
+          </select>
+          <br><br>
+
+          <label for="UstSrok">Установленный срок</label>
+          <input type="text" name="UstSrok" id="UstSrok" minlength="1" maxlength="50" required title="Установленный срок">
+          <br><br>
+        </fieldset>
+
+        <h1>Документ</h1>
+        <fieldset>
+          <legend>Документ</legend>
+          <label for="IDdoc">Идентификатор документа</label>
+          <input type="text" name="IDdoc" id="IDdoc" minlength="1" maxlength="36" required title="Идентификатор документа">
+          <br><br>
+
+          <label for="TypeDoc">Тип документа</label>
+          <select name="TypeDoc" id="TypeDoc" required title="Тип документа">
+            <option value="1">1</option>
+            <option value="2">2</option>
+          </select>
+          <br><br>
+
+          <label for="TypeNal">Вид налога</label>
+          <select name="TypeNal" id="TypeNal" required title="Вид налога">
+            <option value="1">1</option>
+            <option value="2">2</option>            
+            <option value="3">3</option>
+            <option value="4">4</option>            
+            <option value="5">5</option>
+            <option value="6">6</option>
+          </select>
+          <br><br>
+
+          <label for="type_inf_doc">Вид информации</label>
+          <select name="type_inf_doc" id="type_inf_doc" required title="Вид информации">
+            <option value="1">1</option>
+            <option value="2">2</option>            
+            <option value="3">3</option>
+          </select>
+          <br><br>
+
+          <label for="AnyInf">Иная информация</label>
+          <input type="text" name="AnyInf" id="AnyInf" minlength="1" maxlength="5000" title="Иная информация, в том числе о порядке уплаты налога (авансового платежа по налогу)">
+          <br><br>
+        </fieldset>
+
+        <h1>Файл</h1>
+        <fieldset>
+          <legend>Файл</legend>
+          <label for="IDfile">Идентификатор файла</label>
+          <input type="text" name="IDfile" id="IDfile" minlength="1" maxlength="255" required title="Идентификатор файла">
+          <br><br>
+
+          <label for="version">Версия формата:</label>
+          <select id="version" name="version" required title="Версия формата">
+            <option value="4.03">4.03</option>
+          </select>
+          <br><br>
+
+          <label for="type_inf_file">Тип информации</label>
+          <select id="type_inf_file" name="type_inf_file" required title="Тип информации">
+            <option value="УСТ_ИЗМ_ПРЕКР_НАЛОГ">УСТ_ИЗМ_ПРЕКР_НАЛОГ</option>
+          </select>          
+          <br><br>
+
+          <label for="PreVers">Версия передающей программы</label>
+          <input type="text" name="PreVers" id="PreVers" minlength="1" maxlength="40" title="Версия передающей программы">
+          <br><br>
+
+          <label for="KolDoc">Количество документов</label>
+          <input type="number" name="KolDoc" id="KolDoc" min="1" max="999999999" required title="Количество документов">
+          <br><br>
+        </fieldset>
+
+        <fieldset>
+          <legend>Сведения о налоговом периоде</legend>
+
+          <label for="NalPeriod">Налоговый период</label>
+          <input type="text" name="NalPeriod" id="NalPeriod" required title="Налоговый период">
+          <br><br>
+
+        </fieldset>
+
+        <fieldset>
+          <legend>Информация о налогоплательщике</legend>
+          <label for="surname">Фамилия</label>
+          <input type="text" name="surname" id="surname" minlength="1" maxlength="60" required title="Фамилия">
+          <br><br>
+
+          <label for="name">Имя</label>
+          <input type="text" name="name" id="name" minlength="1" maxlength="60" required title="Имя">
+          <br><br>
+
+          <label for="patronymic">Отчество</label>
+          <input type="text" name="patronymic" id="patronymic" minlength="1" maxlength="60" title="Отчество">
+          <br><br>
+
+          <label for="IDorg">Идентификационный номер</label>
+          <input type="text" name="IDorg" id="IDorg" title="Идентификационный номер налогоплательщика - организации" pattern="([0-9]{1}[1-9]{1}|[1-9]{1}[0-9]{1})[0-9]{8}">
+          <br><br>
+
+          <label for="ReasonCode">Код причины постановки на учет</label>
+          <input type="text" name="ReasonCode" id="ReasonCode" title="Код причины постановки на учет (КПП) - 5 и 6 знаки от 0-9 и A-Z" pattern="([0-9]{1}[1-9]{1}|[1-9]{1}[0-9]{1})([0-9]{2})([0-9A-Z]{2})([0-9]{3})">
+          <br><br>
+
+          <label for="RegNumber">Регистрационный номер юридического лица</label>
+          <input type="text" name="RegNumber" id="RegNumber" title="Основной государственный регистрационный номер юридического лица" pattern="[0-9]{13}">
+          <br><br>
+
+          <label for="CodeSSRF">Код из Справочника субъектов Российской Федерации</label>
+          <input type="text" name="CodeSSRF" id="CodeSSRF" title="Код из Справочника субъектов Российской Федерации" pattern="[0-9]{2}">
+          <br><br>
+
+          <label for="CodeORKTMO">Код из Общероссийского классификатора территорий муниципальных образований</label>
+          <input type="text" name="CodeORKTMO" id="CodeORKTMO" title="Код из Общероссийского классификатора территорий муниципальных образований" pattern="[0-9]{8}|[0-9]{11}">
+          <br><br>
+
+          <label for="CodeKSONO">Коды из Классификатора системы обозначений налоговых органов</label>
+          <input type="text" name="CodeKSONO" id="CodeKSONO" title="Коды из Классификатора системы обозначений налоговых органов" pattern="[0-9]{4}">
+          <br><br>
+
+          <label for="CodeKND">Код из Классификатора налоговой документации</label>
+          <input type="text" name="CodeKND" id="CodeKND" title="Код из Классификатора налоговой документации" pattern="[0-9]{2}">
+          <br><br>
+
+          <label for="date-mg">Дата в формате ММ.ГГГГ:</label>
+          <input type="text" id="date-mg" name="date-mg" 
+                 pattern="(01|02|03|04|05|06|07|08|09|10|11|12)\.(19[0-9]{2}|20[0-9]{2})" 
+                 maxlength="7" 
+                 title="Введите дату в формате ММ.ГГГГ (например, 01.1900 - 12.2099)">
+
+          <label for="date">Дата в формате ДД.ММ.ГГГГ:</label>
+          <input type="text" id="date" name="date" 
+                pattern="(((0[1-9]{1}|[1-2]{1}[0-9]{1})\.(0[1-9]{1}|1[0-2]{1}))|((30)\.(01|0[3-9]{1}|1[0-2]{1}))|((31)\.(01|03|05|07|08|10|12)))\.(19[0-9]{2}|20[0-9]{2})" 
+                maxlength="10" 
+                title="Введите дату в формате ДД.ММ.ГГГГ (например, 01.01.1900 - 31.12.2099)">
+
+        </fieldset>
+        <button>Отправить</button>
+      </form>
+    </div>
+    <script>
+        document.getElementById('fillTestData').addEventListener('click', function(event) {
+          event.preventDefault(); 
+    
+          const testData = {
+            'fio': 'Иванов Иван Иванович',
+            'knd': '1190803',
+            'docDate': '2025-02-20',
+            'NameOrgan': 'УФНС России по г. Москве',
+            'INNOrgan': '7701234567',
+            'KPPOrgan': '770101001',
+            'OGRNOrgan': '1027700123456',
+            'NalPerMesGod': 'Решение об установлении налога',
+            'NameOrgAkt': 'Московская городская дума',
+            'DatePrinAkt': '2025-01-15',
+            'NomAkt': '123/2025',
+            'DateOpubAkt': '2025-01-20',
+            'DateVstypAkt': '2025-02-01',
+            'NameObject': 'Жилая недвижимость',
+            'DescNalStav': '1',
+            'taxRate': '0.015000',
+            'measure': '1',
+            'PerNalStav': '1',
+            'category_nal_lgot': 'Многодетные семьи',
+            'SvedNalLgot': '2',
+            'ContentNL': 'Снижение ставки на 50%',
+            'category_nal_vych': 'Физические лица',
+            'SvedNalVych': '1',
+            'SizeNV': '50000',
+            'KodUstSrok': '1',
+            'UstSrok': '31.03.2025',
+            'IDdoc': 'doc-uuid-1234567890',
+            'TypeDoc': '1',
+            'TypeNal': '2',
+            'type_inf_doc': '1',
+            'AnyInf': 'Порядок уплаты установлен решением №123',
+            'IDfile': 'file-uuid-0987654321',
+            'version': '4.03',
+            'type_inf_file': 'УСТ_ИЗМ_ПРЕКР_НАЛОГ',
+            'PreVers': '1.2.3',
+            'KolDoc': '5',
+            'NalPeriod': '2025 год',
+            'surname': 'Иванов',
+            'name': 'Иван',
+            'patronymic': 'Иванович',
+            'IDorg': '7709876543',
+            'ReasonCode': '770101001',
+            'RegNumber': '1027700987654',
+            'CodeSSRF': '77',
+            'CodeORKTMO': '45383000',
+            'CodeKSONO': '7701',
+            'CodeKND': '11',
+            'date-mg': '02.2025',
+            'date': '20.02.2025'
+          };
+    
+          
+          const form = document.getElementById('taxForm');
+          for (const [key, value] of Object.entries(testData)) {
+            const input = form.querySelector(`[name="${key}"]`);
+            if (input) {
+              if (input.tagName === 'SELECT') {
+                input.value = value; 
+              } else {
+                input.value = value; 
+              }
+            }
+          }
+        });
+      </script>
+{% endblock %}

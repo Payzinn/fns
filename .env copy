@@ -1,0 +1,5 @@
+POSTGRES_DB=НАЗВАНИЕ БД
+POSTGRES_USER=ПОЛЬЗОВАТЕЛЬ
+POSTGRES_PASSWORD=ПАРОЛЬ ПОЛЬЗОВАТЕЛЯ
+POSTGRES_HOST=db
+POSTGRES_PORT=5432

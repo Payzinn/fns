@@ -9,7 +9,6 @@ def submit_form(request):
     if request.method == 'POST':
         data = request.POST
 
-        # Сохранение в базу данных
         tax_doc = TaxDocument(
             fio=data.get('fio'),
             knd=data['knd'],
@@ -63,7 +62,6 @@ def submit_form(request):
         )
         tax_doc.save()
 
-        # Генерация XML
         root = ET.Element("Файл")
         root.set("ИдФайл", data['IDfile'])
         root.set("ВерсФорм", data['version'])

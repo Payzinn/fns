@@ -4,11 +4,15 @@ from .models import TaxDocument
 from decimal import Decimal
 import xml.etree.ElementTree as ET
 from datetime import datetime
+from django.utils import timezone
+from xml.dom import minidom
 
 def submit_form(request):
     if request.method == 'POST':
         data = request.POST
+        files = request.FILES
 
+        # Сохранение в базу данных (без изменений)
         tax_doc = TaxDocument(
             fio=data.get('fio'),
             knd=data['knd'],
@@ -58,10 +62,12 @@ def submit_form(request):
             code_ksono=data.get('CodeKSONO'),
             code_knd=data.get('CodeKND'),
             date_mg=data.get('date-mg'),
-            date_full=data.get('date')
+            date_full=data.get('date'),
+            pdf_file=files.get('pdf_file')
         )
         tax_doc.save()
 
+        # Создание XML
         root = ET.Element("Файл")
         root.set("ИдФайл", data['IDfile'])
         root.set("ВерсФорм", data['version'])
@@ -70,25 +76,29 @@ def submit_form(request):
             root.set("ВерсПрог", data.get('PreVers'))
         root.set("КолДок", data['KolDoc'])
 
+        # Элемент <ИдОтпр> (необязательный)
         if data.get('fio'):
             id_otp = ET.SubElement(root, "ИдОтпр")
             fio_otp = ET.SubElement(id_otp, "ФИООтв")
             fio_parts = data['fio'].split()
             fio_otp.set("Фамилия", fio_parts[0])
-            fio_otp.set("Имя", fio_parts[1] if len(fio_parts) > 1 else "")
-            fio_otp.set("Отчество", fio_parts[2] if len(fio_parts) > 2 else "")
+            fio_otp.set("Имя", fio_parts[1] )
+            fio_otp.set("Отчество", fio_parts[2])
 
+        # Элемент <ОписПерСвед>
         opis_per_sved = ET.SubElement(root, "ОписПерСвед")
         opis_per_sved.set("КНД", data['knd'])
         doc_date = datetime.strptime(data['docDate'], '%Y-%m-%d').strftime('%d.%m.%Y')
         opis_per_sved.set("ДатаДок", doc_date)
 
+        # Элемент <СвОргРег>
         sv_org_reg = ET.SubElement(root, "СвОргРег")
         sv_org_reg.set("НаимОрг", data['NameOrgan'])
         sv_org_reg.set("ИННЮЛ", data['INNOrgan'])
         sv_org_reg.set("КПП", data['KPPOrgan'])
         sv_org_reg.set("ОГРН", data['OGRNOrgan'])
 
+        # Элемент <Документ>
         doc = ET.SubElement(root, "Документ")
         doc.set("ИдДок", data['IDdoc'])
         doc.set("ТипДок", data['TypeDoc'])
@@ -97,6 +107,7 @@ def submit_form(request):
         if data.get('AnyInf'):
             doc.set("ИнаяИнф", data['AnyInf'])
 
+        # Элемент <СвАкт>
         sv_akt = ET.SubElement(doc, "СвАкт")
         sv_akt.set("ВидАкт", data['NalPerMesGod'])
         sv_akt.set("НаимОргАкт", data['NameOrgAkt'])
@@ -109,18 +120,29 @@ def submit_form(request):
         date_vstyp_akt = datetime.strptime(data['DateVstypAkt'], '%Y-%m-%d').strftime('%d.%m.%Y')
         sv_akt.set("ДатаВступАкт", date_vstyp_akt)
 
+        # Обязательный выбор: <НалПерМесГод> или <НалПерГод>
         if data.get('date-mg'):
             nal_per_mes_god = ET.SubElement(sv_akt, "НалПерМесГод")
             nal_per_mes_god.text = data['date-mg']
         elif data.get('NalPeriod'):
             nal_per_god = ET.SubElement(sv_akt, "НалПерГод")
-            nal_per_god.text = data['NalPeriod'].split()[0]
+            nal_per_god.text = data['NalPeriod'].split()[0]  
+        else:
+            # Если ни один не указан, используем текущий год
+            nal_per_god = ET.SubElement(sv_akt, "НалПерГод")
+            nal_per_god.text = str(timezone.now().year)
 
+        # Обязательный элемент <ОКТМО> (хотя бы один)
         if data.get('CodeORKTMO'):
             oktmo = ET.SubElement(sv_akt, "ОКТМО")
             oktmo.text = data['CodeORKTMO']
+        else:
+            # Если ОКТМО не указано, добавляем тестовый код
+            oktmo = ET.SubElement(sv_akt, "ОКТМО")
+            oktmo.text = "00000000"  # Замените на подходящий код
 
-        if any([data.get('NameObject'), data.get('taxRate'), data.get('measure'), data.get('PerNalStav')]):
+        # Остальные элементы (необязательные)
+        if data.get('NameObject') or data.get('taxRate') or data.get('measure') or data.get('PerNalStav'):
             sv_nal_stav = ET.SubElement(doc, "СвНалСтав")
             sv_nal_stav.set("СведНалСтав", data['DescNalStav'])
             if data.get('NameObject'):
@@ -132,7 +154,7 @@ def submit_form(request):
             if data.get('PerNalStav'):
                 sv_nal_stav.set("ПерНалСтав", data['PerNalStav'])
 
-        if any([data.get('category_nal_lgot'), data.get('ContentNL')]):
+        if data.get('category_nal_lgot') or data.get('ContentNL'):
             sv_nal_lgot = ET.SubElement(doc, "СвНалЛьгот")
             sv_nal_lgot.set("СведНалЛьгот", data['SvedNalLgot'])
             if data.get('category_nal_lgot'):
@@ -140,7 +162,7 @@ def submit_form(request):
             if data.get('ContentNL'):
                 sv_nal_lgot.set("СодНалЛьгот", data['ContentNL'])
 
-        if any([data.get('category_nal_vych'), data.get('SizeNV')]):
+        if data.get('category_nal_vych') or data.get('SizeNV'):
             sv_nal_vych = ET.SubElement(doc, "СвНалВыч")
             sv_nal_vych.set("СведНалВыч", data['SvedNalVych'])
             if data.get('category_nal_vych'):
@@ -153,18 +175,22 @@ def submit_form(request):
             sv_ust_srok.set("КодУстСрок", data['KodUstSrok'])
             sv_ust_srok.set("УстСрок", data['UstSrok'])
 
-        # Сохранение XML на сервере
+        # Сохранение XML с уникальным именем
         xml_string = ET.tostring(root, encoding='utf-8', method='xml')
-        filename = f"{data['IDfile']}.xml"
+        timestamp = timezone.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"{data['IDfile']}_{timestamp}.xml"
         filepath = os.path.join('xml_files', filename)
         os.makedirs('xml_files', exist_ok=True)
         with open(filepath, 'wb') as f:
             f.write(xml_string)
 
-        # Редирект на страницу успеха
+        xml_string = minidom.parseString(xml_string).toprettyxml(indent="  ")
+        request.session['xml_content'] = xml_string
         return redirect('success')
 
     return render(request, 'fns_app/index.html')
 
 def some_success_view(request):
-   return HttpResponse("Данные успешно записаны в базу данных!")
+    xml_content = request.session.get('xml_content', 'XML не найден')
+    request.session.pop('xml_content', None)
+    return render(request, 'fns_app/success.html', {'xml_content': xml_content})

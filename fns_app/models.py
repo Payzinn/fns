@@ -1,4 +1,8 @@
 from django.db import models
+from django.utils import timezone
+
+def pdf_upload_path(instance, filename):
+    return f'pdf_files/{timezone.now().strftime("%Y%m%d_%H%M%S")}_{filename}'
 
 class TaxDocument(models.Model):
     fio = models.CharField(max_length=255, null=True)
@@ -50,6 +54,7 @@ class TaxDocument(models.Model):
     code_knd = models.CharField(max_length=2, null=True)
     date_mg = models.CharField(max_length=7, null=True)
     date_full = models.CharField(max_length=10, null=True)
+    pdf_file = models.FileField(upload_to='pdf_files/', null=True, blank=True)
 
     class Meta:
         db_table = 'tax_documents'

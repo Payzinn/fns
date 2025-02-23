@@ -1,6 +1,9 @@
 from django.db import models
 from django.utils import timezone
 
+def xml_upload_path(instance, filename):
+    return f'xml_files/{timezone.now().strftime("%Y%m%d_%H%M%S")}_{filename}'
+
 def pdf_upload_path(instance, filename):
     return f'pdf_files/{timezone.now().strftime("%Y%m%d_%H%M%S")}_{filename}'
 
@@ -55,6 +58,7 @@ class TaxDocument(models.Model):
     date_mg = models.CharField(max_length=7, null=True)
     date_full = models.CharField(max_length=10, null=True)
     pdf_file = models.FileField(upload_to='pdf_files/', null=True, blank=True)
+    xml_file = models.FileField(upload_to=xml_upload_path, null=True, blank=True)
 
     class Meta:
         db_table = 'tax_documents'

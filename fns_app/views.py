@@ -7,6 +7,7 @@ from datetime import datetime
 from django.utils import timezone
 from xml.dom import minidom
 from django.core.files import File
+from io import BytesIO
 
 def submit_form(request):
     if request.method == 'POST':
@@ -168,14 +169,11 @@ def submit_form(request):
         xml_raw = ET.tostring(root, encoding='utf-8', method='xml')
         xml_string = minidom.parseString(xml_raw).toprettyxml(indent="  ")
 
-
-        # Сохранение XML в поле xml_file
+        # Сохранение XML напрямую в поле xml_file
         timestamp = timezone.now().strftime("%Y%m%d_%H%M%S")
         filename = f"{data['IDfile']}_{timestamp}.xml"
-        with open(filename, 'w', encoding='utf-8') as temp_file:
-            temp_file.write(xml_string)
-        with open(filename, 'rb') as temp_file:
-            tax_doc.xml_file.save(filename, File(temp_file), save=False)
+        xml_file = BytesIO(xml_string.encode('utf-8'))  # Создаём байтовый поток в памяти
+        tax_doc.xml_file.save(filename, File(xml_file), save=False)
 
         # Сохранение объекта в базу данных
         tax_doc.save()

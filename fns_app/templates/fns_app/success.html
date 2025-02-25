@@ -3,10 +3,12 @@
 {% block content %}
 <div class="container">
     <h1>Файлы успешно добавлены в таблицу</h1>
+    <div class="wrapper">
     <a href="{% url 'submit_form' %}">Обратно</a>
     {% if xml_path %}
         <a href="{{ xml_path }}" download><button>Скачать XML</button></a>
         <p>{{xml_data}}</p>
+    </div>
     {% else %}
         <p>XML-файл не сформирован</p>
     {% endif %}

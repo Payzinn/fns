@@ -33,6 +33,11 @@
     justify-content: center;
 }
 
+.wrapper{
+    display: flex;
+    flex-direction: column;
+}
+
 button{
     background-color: rgb(41, 141, 41);
     padding: 10px;

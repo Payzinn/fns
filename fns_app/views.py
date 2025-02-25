@@ -165,7 +165,6 @@ def submit_form(request):
             sv_ust_srok.set("КодУстСрок", data['KodUstSrok'])
             sv_ust_srok.set("УстСрок", data['UstSrok'])
 
-        # Форматирование XML
         xml_raw = ET.tostring(root, encoding='utf-8', method='xml')
         xml_string = minidom.parseString(xml_raw).toprettyxml(indent="  ")
 

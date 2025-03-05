@@ -15,7 +15,9 @@ def submit_form(request):
         files = request.FILES
 
         tax_doc = TaxDocument(
-            # Удалено fio, так как используется surname, name, patronymic
+            fio=data['fio'],
+            knd=data['knd'],
+            doc_date=data['docDate'],
             name_organ=data['NameOrgan'],
             inn_organ=data['INNOrgan'],
             kpp_organ=data['KPPOrgan'],
@@ -31,6 +33,7 @@ def submit_form(request):
             tax_rate=Decimal(data['taxRate']) if data.get('taxRate') else None,
             measure=data.get('measure'),
             per_nal_stav=data.get('PerNalStav') if data.get('PerNalStav') != 'none' else None,
+            oktmo_code=data.get('CodeORKTMO') if data.get('CodeORKTMO') else None,
             category_nal_lgot=data.get('CategoryNalLgot'),
             sved_nal_lgot=data['SvedNalLgot'] if data.get('SvedNalLgot') != 'none' else None,
             content_nl=data.get('ContentNL'),
@@ -42,46 +45,33 @@ def submit_form(request):
             sv_otm_upl=data.get('SvOtmUpl'),
             kod_ust_srok=data['KodUstSrok'] if data.get('KodUstSrok') != 'none' else None,
             ust_srok=data['UstSrok'],
-            type_doc=data['TypeDoc'],
-            type_nal=data['TypeNal'],
             type_inf_doc=data['TypeInfDoc'],
+            type_nal=data['TypeNal'],
+            type_inf=data['TypeInf'],
             any_inf=data.get('AnyInf'),
-            version=data['version'],
-            type_inf_file=data['TypeInfFile'],
-            pre_vers=data.get('PreVers'),
-            kol_doc=data['KolDoc'],
             nal_period=data['NalPeriod'],
-            surname=data['surname'],
-            name=data['name'],
-            patronymic=data.get('patronymic'),
-            id_org=data.get('IDorg'),
-            reason_code=data.get('ReasonCode'),
-            reg_number=data['RegNumber'],
             code_ssrf=data.get('CodeSSRF'),
             code_orktmo=data.get('CodeORKTMO'),
             code_ksono=data.get('CodeKSONO'),
-            code_knd=data.get('CodeKND'),  # Удалено knd, используется code_knd
+            code_knd=data.get('CodeKND'),
             date_mg=data.get('date-mg'),
-            date_full=data.get('date'),  # Удалено doc_date, используется date_full
+            date_full=data.get('date'),
             pdf_file=files.get('pdf_file')
         )
         tax_doc.save()
+
         # Создание XML
         root = ET.Element("Файл")
         root.set("ИдФайл", tax_doc.id_file)
-        root.set("ВерсФорм", data['version'])
-        root.set("ТипИнф", data['TypeInfFile'])  # Обновлено с type_inf_file на TypeInfFile
         if data.get('PreVers'):
             root.set("ВерсПрог", data.get('PreVers'))
-        root.set("КолДок", data['KolDoc'])
-
-        # Удаляем устаревший блок с fio, так как он больше не используется
-        # Вместо этого предполагается, что данные отправителя обрабатываются отдельно, если нужно
 
         # Описание персональных сведений
         opis_per_sved = ET.SubElement(root, "ОписПерСвед")
-        opis_per_sved.set("КНД", data['CodeKND'])  # Заменяем knd на CodeKND
-        doc_date = datetime.strptime(data['date'], '%d.%m.%Y').strftime('%d.%m.%Y')  # Заменяем docDate на date
+        # Используем новое поле code_knd
+        opis_per_sved.set("КНД", data.get('CodeKND', ''))
+        # Поле для даты документа теперь передается как date (в формате ДД.ММ.ГГГГ)
+        doc_date = datetime.strptime(data['date'], '%d.%m.%Y').strftime('%d.%m.%Y')
         opis_per_sved.set("ДатаДок", doc_date)
 
         # Сведения об организации
@@ -94,9 +84,8 @@ def submit_form(request):
         # Документ
         doc = ET.SubElement(root, "Документ")
         doc.set("ИдДок", tax_doc.id_doc)
-        doc.set("ТипДок", data['TypeDoc'])
         doc.set("ВидНал", data['TypeNal'])
-        doc.set("ВидИнф", data['TypeInfDoc'])  # Обновлено с type_inf_doc на TypeInfDoc
+        doc.set("ВидИнф", data['TypeInfDoc'])
         if data.get('AnyInf'):
             doc.set("ИнаяИнф", data['AnyInf'])
 
@@ -115,8 +104,8 @@ def submit_form(request):
 
         # Налоговый период
         if data.get('date-mg'):
-            nal_per_mes_god = ET.SubElement(sv_akt, "НалПерМесГод")
-            nal_per_mes_god.text = data['date-mg']
+            nal_per_mes_god_xml = ET.SubElement(sv_akt, "НалПерМесГод")
+            nal_per_mes_god_xml.text = data['date-mg']
         elif data.get('NalPeriod'):
             nal_per_god = ET.SubElement(sv_akt, "НалПерГод")
             nal_per_god.text = data['NalPeriod'].split()[0]
@@ -150,7 +139,7 @@ def submit_form(request):
             sv_nal_lgot = ET.SubElement(doc, "СвНалЛьгот")
             sv_nal_lgot.set("СведНалЛьгот", data['SvedNalLgot'])
             if data.get('CategoryNalLgot'):
-                sv_nal_lgot.set("КатегНал", data['CategoryNalLgot'])  # Обновлено с category_nal_lgot
+                sv_nal_lgot.set("КатегНал", data['CategoryNalLgot'])
             if data.get('ContentNL'):
                 sv_nal_lgot.set("СодНалЛьгот", data['ContentNL'])
 
@@ -159,7 +148,7 @@ def submit_form(request):
             sv_nal_vych = ET.SubElement(doc, "СвНалВыч")
             sv_nal_vych.set("СведНалВыч", data['SvedNalVych'])
             if data.get('CategoryNalVych'):
-                sv_nal_vych.set("КатегНал", data['CategoryNalVych'])  # Обновлено с category_nal_vych
+                sv_nal_vych.set("КатегНал", data['CategoryNalVych'])
             if data.get('SizeNV'):
                 sv_nal_vych.set("РазмНалВыч", data['SizeNV'])
 
@@ -169,27 +158,27 @@ def submit_form(request):
             sv_ust_srok.set("КодУстСрок", data['KodUstSrok'])
             sv_ust_srok.set("УстСрок", data['UstSrok'])
 
-        # Добавление новых полей
+        # Добавление сведений об установлении сроков уплаты (новые поля)
         if data.get('SvOsobOpr'):
-            sv_osob_opr = ET.SubElement(doc, "СвОсобОпр")
-            sv_osob_opr.text = data['SvOsobOpr']
+            sv_osob_opr_xml = ET.SubElement(doc, "СвОсобОпр")
+            sv_osob_opr_xml.text = data['SvOsobOpr']
         if data.get('SvDataNach'):
-            sv_data_nach = ET.SubElement(doc, "СвДатаНач")
-            sv_data_nach.text = data['SvDataNach']
+            sv_data_nach_xml = ET.SubElement(doc, "СвДатаНач")
+            sv_data_nach_xml.text = data['SvDataNach']
         if data.get('SvOtmUpl'):
-            sv_otm_upl = ET.SubElement(doc, "СвОтмУпл")
-            sv_otm_upl.text = data['SvOtmUpl']
+            sv_otm_upl_xml = ET.SubElement(doc, "СвОтмУпл")
+            sv_otm_upl_xml.text = data['SvOtmUpl']
+
         xml_raw = ET.tostring(root, encoding='utf-8', method='xml')
         xml_string = minidom.parseString(xml_raw).toprettyxml(indent="  ")
 
-        # Сохранение XML напрямую в поле xml_file
+        # Сохранение XML в поле xml_file
         timestamp = timezone.now().strftime("%Y%m%d_%H%M%S")
         filename = f"{tax_doc.id_file}_{timestamp}.xml"
-        xml_file = BytesIO(xml_string.encode('utf-8'))  # Создаём байтовый поток в памяти
+        xml_file = BytesIO(xml_string.encode('utf-8'))
         tax_doc.xml_file.save(filename, File(xml_file), save=False)
 
-        # Сохранение объекта в базу данных
-        
+        tax_doc.save()
 
         # Передача данных через сессию
         request.session['xml_path'] = tax_doc.xml_file.url

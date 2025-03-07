@@ -14,95 +14,143 @@ def submit_form(request):
         data = request.POST
         files = request.FILES
 
-        tax_doc = TaxDocument(
-            fio=data['fio'],
-            knd=data['knd'],
-            doc_date=data['docDate'],
-            name_organ=data['NameOrgan'],
-            inn_organ=data['INNOrgan'],
-            kpp_organ=data['KPPOrgan'],
-            ogrn_organ=data['OGRNOrgan'],
-            nal_per_mes_god=data['NalPerMesGod'],
-            name_org_akt=data['NameOrgAkt'],
-            date_prin_akt=data['DatePrinAkt'],
-            nom_akt=data.get('NomAkt'),
-            date_opub_akt=data['DateOpubAkt'],
-            date_vstyp_akt=data['DateVstypAkt'],
-            name_object=data.get('NameObject'),
-            desc_nal_stav=data['DescNalStav'] if data.get('DescNalStav') != 'none' else None,
-            tax_rate=Decimal(data['taxRate']) if data.get('taxRate') else None,
-            measure=data.get('measure'),
-            per_nal_stav=data.get('PerNalStav') if data.get('PerNalStav') != 'none' else None,
-            oktmo_code=data.get('CodeORKTMO') if data.get('CodeORKTMO') else None,
-            category_nal_lgot=data.get('CategoryNalLgot'),
-            sved_nal_lgot=data['SvedNalLgot'] if data.get('SvedNalLgot') != 'none' else None,
-            content_nl=data.get('ContentNL'),
-            category_nal_vych=data.get('CategoryNalVych'),
-            sved_nal_vych=data['SvedNalVych'] if data.get('SvedNalVych') != 'none' else None,
-            size_nv=data.get('SizeNV'),
-            sv_osob_opr=data.get('SvOsobOpr'),
-            sv_data_nach=data.get('SvDataNach'),
-            sv_otm_upl=data.get('SvOtmUpl'),
-            kod_ust_srok=data['KodUstSrok'] if data.get('KodUstSrok') != 'none' else None,
-            ust_srok=data['UstSrok'],
-            type_inf_doc=data['TypeInfDoc'],
-            type_nal=data['TypeNal'],
-            type_inf=data['TypeInf'],
-            any_inf=data.get('AnyInf'),
-            nal_period=data['NalPeriod'],
-            code_ssrf=data.get('CodeSSRF'),
-            code_orktmo=data.get('CodeORKTMO'),
-            code_ksono=data.get('CodeKSONO'),
-            code_knd=data.get('CodeKND'),
-            date_mg=data.get('date-mg'),
-            date_full=data.get('date'),
-            pdf_file=files.get('pdf_file')
-        )
+        tax_doc = TaxDocument()
+        if data.get('fio'):
+            tax_doc.fio = data['fio']
+        if data.get('knd'):
+            tax_doc.knd = data['knd']
+        if data.get('docDate'):
+            tax_doc.doc_date = data['docDate']
+        if data.get('NameOrgan'):
+            tax_doc.name_organ = data['NameOrgan']
+        if data.get('INNOrgan'):
+            tax_doc.inn_organ = data['INNOrgan']
+        if data.get('KPPOrgan'):
+            tax_doc.kpp_organ = data['KPPOrgan']
+        if data.get('OGRNOrgan'):
+            tax_doc.ogrn_organ = data['OGRNOrgan']
+        if data.get('NalPerMesGod'):
+            tax_doc.nal_per_mes_god = data['NalPerMesGod']
+        if data.get('NameOrgAkt'):
+            tax_doc.name_org_akt = data['NameOrgAkt']
+        if data.get('DatePrinAkt'):
+            tax_doc.date_prin_akt = data['DatePrinAkt']
+        if data.get('NomAkt'):
+            tax_doc.nom_akt = data['NomAkt']
+        if data.get('DateOpubAkt'):
+            tax_doc.date_opub_akt = data['DateOpubAkt']
+        if data.get('DateVstypAkt'):
+            tax_doc.date_vstyp_akt = data['DateVstypAkt']
+        if data.get('NameObject'):
+            tax_doc.name_object = data['NameObject']
+        if data.get('DescNalStav') and data.get('DescNalStav') != 'none':
+            tax_doc.desc_nal_stav = data['DescNalStav']
+        if data.get('taxRate'):
+            tax_doc.tax_rate = Decimal(data['taxRate'])
+        if data.get('measure'):
+            tax_doc.measure = data['measure']
+        if data.get('PerNalStav') and data.get('PerNalStav') != 'none':
+            tax_doc.per_nal_stav = data['PerNalStav']
+        if data.get('CodeORKTMO'):
+            tax_doc.oktmo_code = data['CodeORKTMO']
+        if data.get('CategoryNalLgot'):
+            tax_doc.category_nal_lgot = data['CategoryNalLgot']
+        if data.get('SvedNalLgot') and data.get('SvedNalLgot') != 'none':
+            tax_doc.sved_nal_lgot = data['SvedNalLgot']
+        if data.get('ContentNL'):
+            tax_doc.content_nl = data['ContentNL']
+        if data.get('CategoryNalVych'):
+            tax_doc.category_nal_vych = data['CategoryNalVych']
+        if data.get('SvedNalVych') and data.get('SvedNalVych') != 'none':
+            tax_doc.sved_nal_vych = data['SvedNalVych']
+        if data.get('SizeNV'):
+            tax_doc.size_nv = data['SizeNV']
+        if data.get('SvOsobOpr'):
+            tax_doc.sv_osob_opr = data['SvOsobOpr']
+        if data.get('SvDataNach'):
+            tax_doc.sv_data_nach = data['SvDataNach']
+        if data.get('SvOtmUpl'):
+            tax_doc.sv_otm_upl = data['SvOtmUpl']
+        if data.get('KodUstSrok') and data.get('KodUstSrok') != 'none':
+            tax_doc.kod_ust_srok = data['KodUstSrok']
+        if data.get('UstSrok'):
+            tax_doc.ust_srok = data['UstSrok']
+        if data.get('TypeInfDoc'):
+            tax_doc.type_inf_doc = data['TypeInfDoc']
+        if data.get('TypeNal'):
+            tax_doc.type_nal = data['TypeNal']
+        if data.get('TypeInf'):
+            tax_doc.type_inf = data['TypeInf']
+        if data.get('AnyInf'):
+            tax_doc.any_inf = data['AnyInf']
+        if data.get('NalPeriod'):
+            tax_doc.nal_period = data['NalPeriod']
+        if data.get('CodeSSRF'):
+            tax_doc.code_ssrf = data['CodeSSRF']
+        if data.get('CodeORKTMO'):
+            tax_doc.code_orktmo = data['CodeORKTMO']
+        if data.get('CodeKSONO'):
+            tax_doc.code_ksono = data['CodeKSONO']
+        if data.get('CodeKND'):
+            tax_doc.code_knd = data['CodeKND']
+        if data.get('date-mg'):
+            tax_doc.date_mg = data['date-mg']
+        if data.get('date'):
+            tax_doc.date_full = data['date']
+        if files.get('pdf_file'):
+            tax_doc.pdf_file = files['pdf_file']
         tax_doc.save()
 
-        # Создание XML
         root = ET.Element("Файл")
-        root.set("ИдФайл", tax_doc.id_file)
+        if tax_doc.id_file:
+            root.set("ИдФайл", tax_doc.id_file)
         if data.get('PreVers'):
-            root.set("ВерсПрог", data.get('PreVers'))
+            root.set("ВерсПрог", data['PreVers'])
 
-        # Описание персональных сведений
         opis_per_sved = ET.SubElement(root, "ОписПерСвед")
-        # Используем новое поле code_knd
-        opis_per_sved.set("КНД", data.get('CodeKND', ''))
-        # Поле для даты документа теперь передается как date (в формате ДД.ММ.ГГГГ)
-        doc_date = datetime.strptime(data['date'], '%d.%m.%Y').strftime('%d.%m.%Y')
-        opis_per_sved.set("ДатаДок", doc_date)
+        if data.get('CodeKND'):
+            opis_per_sved.set("КНД", data['CodeKND'])
+        if data.get('date'):
+            doc_date = datetime.strptime(data['date'], '%d.%m.%Y').strftime('%d.%m.%Y')
+            opis_per_sved.set("ДатаДок", doc_date)
 
-        # Сведения об организации
         sv_org_reg = ET.SubElement(root, "СвОргРег")
-        sv_org_reg.set("НаимОрг", data['NameOrgan'])
-        sv_org_reg.set("ИННЮЛ", data['INNOrgan'])
-        sv_org_reg.set("КПП", data['KPPOrgan'])
-        sv_org_reg.set("ОГРН", data['OGRNOrgan'])
+        if data.get('NameOrgan'):
+            sv_org_reg.set("НаимОрг", data['NameOrgan'])
+        if data.get('INNOrgan'):
+            sv_org_reg.set("ИННЮЛ", data['INNOrgan'])
+        if data.get('KPPOrgan'):
+            sv_org_reg.set("КПП", data['KPPOrgan'])
+        if data.get('OGRNOrgan'):
+            sv_org_reg.set("ОГРН", data['OGRNOrgan'])
 
-        # Документ
         doc = ET.SubElement(root, "Документ")
-        doc.set("ИдДок", tax_doc.id_doc)
-        doc.set("ВидНал", data['TypeNal'])
-        doc.set("ВидИнф", data['TypeInfDoc'])
+        if tax_doc.id_doc:
+            doc.set("ИдДок", tax_doc.id_doc)
+        if data.get('TypeNal'):
+            doc.set("ВидНал", data['TypeNal'])
+        if data.get('TypeInfDoc'):
+            doc.set("ВидИнф", data['TypeInfDoc'])
         if data.get('AnyInf'):
             doc.set("ИнаяИнф", data['AnyInf'])
 
-        # Сведения об акте
         sv_akt = ET.SubElement(doc, "СвАкт")
-        sv_akt.set("ВидАкт", data['NalPerMesGod'])
-        sv_akt.set("НаимОргАкт", data['NameOrgAkt'])
-        date_prin_akt = datetime.strptime(data['DatePrinAkt'], '%Y-%m-%d').strftime('%d.%m.%Y')
-        sv_akt.set("ДатаПринАкт", date_prin_akt)
+        if data.get('NalPerMesGod'):
+            sv_akt.set("ВидАкт", data['NalPerMesGod'])
+        if data.get('NameOrgAkt'):
+            sv_akt.set("НаимОргАкт", data['NameOrgAkt'])
+        if data.get('DatePrinAkt'):
+            date_prin_akt = datetime.strptime(data['DatePrinAkt'], '%Y-%m-%d').strftime('%d.%m.%Y')
+            sv_akt.set("ДатаПринАкт", date_prin_akt)
         if data.get('NomAkt'):
             sv_akt.set("НомАкт", data['NomAkt'])
-        date_opub_akt = datetime.strptime(data['DateOpubAkt'], '%Y-%m-%d').strftime('%d.%m.%Y')
-        sv_akt.set("ДатаОпубАкт", date_opub_akt)
-        date_vstyp_akt = datetime.strptime(data['DateVstypAkt'], '%Y-%m-%d').strftime('%d.%m.%Y')
-        sv_akt.set("ДатаВступАкт", date_vstyp_akt)
+        if data.get('DateOpubAkt'):
+            date_opub_akt = datetime.strptime(data['DateOpubAkt'], '%Y-%m-%d').strftime('%d.%m.%Y')
+            sv_akt.set("ДатаОпубАкт", date_opub_akt)
+        if data.get('DateVstypAkt'):
+            date_vstyp_akt = datetime.strptime(data['DateVstypAkt'], '%Y-%m-%d').strftime('%d.%m.%Y')
+            sv_akt.set("ДатаВступАкт", date_vstyp_akt)
 
-        # Налоговый период
         if data.get('date-mg'):
             nal_per_mes_god_xml = ET.SubElement(sv_akt, "НалПерМесГод")
             nal_per_mes_god_xml.text = data['date-mg']
@@ -113,7 +161,6 @@ def submit_form(request):
             nal_per_god = ET.SubElement(sv_akt, "НалПерГод")
             nal_per_god.text = str(timezone.now().year)
 
-        # Код ОКТМО
         if data.get('CodeORKTMO'):
             oktmo = ET.SubElement(sv_akt, "ОКТМО")
             oktmo.text = data['CodeORKTMO']
@@ -121,44 +168,44 @@ def submit_form(request):
             oktmo = ET.SubElement(sv_akt, "ОКТМО")
             oktmo.text = "00000000"
 
-        # Сведения о налоговой ставке
-        if data.get('NameObject') or data.get('taxRate') or data.get('measure') or data.get('PerNalStav'):
+        if data.get('DescNalStav') or data.get('NameObject') or data.get('taxRate') or data.get('measure') or data.get('PerNalStav'):
             sv_nal_stav = ET.SubElement(doc, "СвНалСтав")
-            sv_nal_stav.set("СведНалСтав", data['DescNalStav'])
+            if data.get('DescNalStav') and data.get('DescNalStav') != 'none':
+                sv_nal_stav.set("СведНалСтав", data['DescNalStav'])
             if data.get('NameObject'):
                 sv_nal_stav.set("НаимОбъект", data['NameObject'])
             if data.get('taxRate'):
                 sv_nal_stav.set("РазмНалСтав", data['taxRate'])
             if data.get('measure'):
                 sv_nal_stav.set("ЕдИзмер", data['measure'])
-            if data.get('PerNalStav'):
+            if data.get('PerNalStav') and data.get('PerNalStav') != 'none':
                 sv_nal_stav.set("ПерНалСтав", data['PerNalStav'])
 
-        # Сведения о налоговых льготах
-        if data.get('CategoryNalLgot') or data.get('ContentNL'):
+        if data.get('SvedNalLgot') or data.get('CategoryNalLgot') or data.get('ContentNL'):
             sv_nal_lgot = ET.SubElement(doc, "СвНалЛьгот")
-            sv_nal_lgot.set("СведНалЛьгот", data['SvedNalLgot'])
+            if data.get('SvedNalLgot') and data.get('SvedNalLgot') != 'none':
+                sv_nal_lgot.set("СведНалЛьгот", data['SvedNalLgot'])
             if data.get('CategoryNalLgot'):
                 sv_nal_lgot.set("КатегНал", data['CategoryNalLgot'])
             if data.get('ContentNL'):
                 sv_nal_lgot.set("СодНалЛьгот", data['ContentNL'])
 
-        # Сведения о налоговых вычетах
-        if data.get('CategoryNalVych') or data.get('SizeNV'):
+        if data.get('SvedNalVych') or data.get('CategoryNalVych') or data.get('SizeNV'):
             sv_nal_vych = ET.SubElement(doc, "СвНалВыч")
-            sv_nal_vych.set("СведНалВыч", data['SvedNalVych'])
+            if data.get('SvedNalVych') and data.get('SvedNalVych') != 'none':
+                sv_nal_vych.set("СведНалВыч", data['SvedNalVych'])
             if data.get('CategoryNalVych'):
                 sv_nal_vych.set("КатегНал", data['CategoryNalVych'])
             if data.get('SizeNV'):
                 sv_nal_vych.set("РазмНалВыч", data['SizeNV'])
 
-        # Сведения об установленном сроке
-        if data.get('UstSrok'):
+        if data.get('KodUstSrok') or data.get('UstSrok'):
             sv_ust_srok = ET.SubElement(doc, "СвУстСрок")
-            sv_ust_srok.set("КодУстСрок", data['KodUstSrok'])
-            sv_ust_srok.set("УстСрок", data['UstSrok'])
+            if data.get('KodUstSrok') and data.get('KodUstSrok') != 'none':
+                sv_ust_srok.set("КодУстСрок", data['KodUstSrok'])
+            if data.get('UstSrok'):
+                sv_ust_srok.set("УстСрок", data['UstSrok'])
 
-        # Добавление сведений об установлении сроков уплаты (новые поля)
         if data.get('SvOsobOpr'):
             sv_osob_opr_xml = ET.SubElement(doc, "СвОсобОпр")
             sv_osob_opr_xml.text = data['SvOsobOpr']
@@ -172,7 +219,6 @@ def submit_form(request):
         xml_raw = ET.tostring(root, encoding='utf-8', method='xml')
         xml_string = minidom.parseString(xml_raw).toprettyxml(indent="  ")
 
-        # Сохранение XML в поле xml_file
         timestamp = timezone.now().strftime("%Y%m%d_%H%M%S")
         filename = f"{tax_doc.id_file}_{timestamp}.xml"
         xml_file = BytesIO(xml_string.encode('utf-8'))
@@ -180,7 +226,6 @@ def submit_form(request):
 
         tax_doc.save()
 
-        # Передача данных через сессию
         request.session['xml_path'] = tax_doc.xml_file.url
         request.session['xml_data'] = xml_string
 
